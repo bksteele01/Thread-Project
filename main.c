@@ -2,12 +2,14 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include "zemaphore.h"
+#include <semaphore.h>
+// #include "zemaphore.h"
 #include "msgq.h"
 
 // SEE Labs/GdbLldbLab for more information on lldb - lowlevel debugger
 
 struct msgq *mq;
+sem_t mutex; //************
 
 //
 // Main threads
@@ -16,6 +18,7 @@ char *messages[] = { "msg1", "msg2", "hellomsg", "gustymsg" };
 
 // sends msgs in messages[]
 void *promtAndSend(void *arg) {
+    sem_wait(&mutex); //**********
     for (int i = 0; i < sizeof(messages)/sizeof(char*); i++) {
         char response[80];
         printf("Send? ");
@@ -25,11 +28,13 @@ void *promtAndSend(void *arg) {
             msgq_send(mq, messages[i]);
         }
     }
+    sem_post(&mutex);//*********
     return NULL;
 }
 
 // consume messges in msgq
 void *recvMsgs(void *arg) {
+    sem_wait(&mutex);//************
     sleep(5);
     int msg_count = msgq_len(mq);
     printf("mq msg_count: %d\n", msg_count);
@@ -39,9 +44,11 @@ void *recvMsgs(void *arg) {
         //free(m);
     }
     return NULL;
+    sem_post(&mutex);//***********
 }
 
 void *passiton(void *arg) {
+    sem_wait(&mutex); //***************
     int me = (int) arg;
     while (1) {
         sleep(1);
@@ -53,13 +60,15 @@ void *passiton(void *arg) {
         printf("passiton%d after send msgq_len: %d\n", me, msgq_len(mq));
         free(m);
     }
+    sem_post(&mutex); //*************
     return NULL;
 }
 
 #define MSGQLEN 4
 
 int main(int argc, char *argv[]) {
-    pthread_t p1, p2;
+    sem_init(&mutex, 0, 1);//**************
+    pthread_t p1, p2, p3;
     mq = msgq_init(MSGQLEN);
     char test = '1';
     if (argc == 2)
@@ -68,7 +77,9 @@ int main(int argc, char *argv[]) {
       case '1':
         printf("test fill and empty msgq\n");
         pthread_create(&p1, NULL, promtAndSend, NULL);
+        pthread_create(&p3, NULL, promtAndSend, NULL);
         pthread_join(p1, NULL);
+        pthread_join(p3, NULL);
         printf("msgq_show() after filling for test 1:\n");
         msgq_show(mq);
         pthread_create(&p2, NULL, recvMsgs, NULL);
@@ -91,6 +102,6 @@ int main(int argc, char *argv[]) {
         printf("invalid test selection!\n");
         break;
     }
+    sem_destroy(&mutex); //*********
     return 0;
 }
-
