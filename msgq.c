@@ -18,7 +18,7 @@ struct msgq *msgq_init(int num_msgs){
 }
 int msgq_send(struct msgq *mq, char *msg){
     struct msgq *head = mq;
-    while(!head == NULL){
+    while(!head == 0){
         if(head->messag == " "){
             char *msg2 = malloc(sizeof(msg));
             msg2 = msg;	
@@ -30,10 +30,24 @@ int msgq_send(struct msgq *mq, char *msg){
     return -1;
 }
 char *msgq_recv(struct msgq *mq){
-    return "";
+    struct msgq *head = mq;
+    while(!head == 0){
+        if(!mq->messag == 0){
+            return head->messag;
+        }
+        head = head->next;
+    }
+
+    return head->messag;
 }
 int msgq_len(struct msgq *mq){
-    return 1;
+    struct msgq *head = mq;
+    int num_mes = 0;
+    while(!head == 0){
+        num_mes++;
+        head = head->next;
+    }
+    return num_mes;
 }
 void msgq_show(struct msgq *mq){
     struct msgq *show = mq;
