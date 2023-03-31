@@ -32,7 +32,7 @@ int msgq_send(struct msgq *mq, char *msg){
 char *msgq_recv(struct msgq *mq){
     struct msgq *head = mq;
     while(!head == 0){
-        if(!mq->messag == 0){
+        if(!head->messag == 0){
             return head->messag;
         }
         head = head->next;

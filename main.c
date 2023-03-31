@@ -68,7 +68,7 @@ void *passiton(void *arg) {
 
 int main(int argc, char *argv[]) {
     sem_init(&mutex, 0, 1);//**************
-    pthread_t p1, p2, p3;
+    pthread_t p1, p2;
     mq = msgq_init(MSGQLEN);
     char test = '1';
     if (argc == 2)
@@ -77,9 +77,7 @@ int main(int argc, char *argv[]) {
       case '1':
         printf("test fill and empty msgq\n");
         pthread_create(&p1, NULL, promtAndSend, NULL);
-        pthread_create(&p3, NULL, promtAndSend, NULL);
         pthread_join(p1, NULL);
-        pthread_join(p3, NULL);
         printf("msgq_show() after filling for test 1:\n");
         msgq_show(mq);
         pthread_create(&p2, NULL, recvMsgs, NULL);
