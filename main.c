@@ -41,10 +41,15 @@ void *recvMsgs(void *arg) {
     for (int i = 0; i < msg_count; i++) {
         char *m = msgq_recv(mq);
         printf("recvMsgs: %s\n", m);
-        //free(m);
+        printf("XXXAAA\n");
+        if(m != " "){
+            free(m);
+        }
+        
     }
-    return NULL;
     sem_post(&mutex);//***********
+    return NULL;
+    
 }
 
 void *passiton(void *arg) {

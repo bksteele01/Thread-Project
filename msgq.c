@@ -1,6 +1,7 @@
 #include "msgq.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 struct msgq *msgq_init(int num_msgs){
     struct msgq *A;
@@ -21,7 +22,7 @@ int msgq_send(struct msgq *mq, char *msg){
     while(!head == 0){
         if(head->messag == " "){
             char *msg2 = malloc(sizeof(msg));
-            msg2 = msg;	
+            strcpy(msg2, msg);	
             head->messag = msg2;
             return 1;
         }
@@ -32,13 +33,14 @@ int msgq_send(struct msgq *mq, char *msg){
 char *msgq_recv(struct msgq *mq){
     struct msgq *head = mq;
     while(!head == 0){
-        if(!head->messag == 0){
-            return head->messag;
+        if(head->messag != " "){
+            char *returner = head->messag;
+            head->messag = " ";
+            return returner;
         }
         head = head->next;
     }
-
-    return head->messag;
+    return " ";
 }
 int msgq_len(struct msgq *mq){
     struct msgq *head = mq;
