@@ -1,5 +1,4 @@
 struct msgq{
-    int place;
     char *messag;
     struct msgq *next;
 
