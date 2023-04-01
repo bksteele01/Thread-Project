@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
     sem_init(&mutex, 0, 1);
     pthread_t p1, p2;
     mq = msgq_init(MSGQLEN);
-    char test = '1';
+    char test = '3';
     if (argc == 2)
         test = argv[1][0];
     switch (test) {
@@ -139,6 +139,28 @@ int main(int argc, char *argv[]) {
         pthread_join(p1, NULL);
         pthread_join(p2, NULL);
         break;
+      case '3': 
+	printf("test fill send msgs and blocks\n");
+        pthread_create(&p1, NULL, promtAndSend, NULL);
+        pthread_join(p1, NULL);
+        printf("msgq_show() after filling for test 3:\n");
+        msgq_show(mq);
+      case'4': 
+	printf("test fill recv msgs and blocks\n");
+        pthread_create(&p1, NULL, recvMsgs, NULL);
+        pthread_join(p1, NULL);
+        printf("msgq_show() after filling for test 4:\n");
+        msgq_show(mq);
+      case '5':
+	printf("test fill a lot\n");
+	int i = 0; 
+	while (i < 101) { 
+            pthread_create(&p1, NULL, promtAndSend, NULL);
+ 	    i++; 
+	} 
+        pthread_join(p1, NULL);
+        printf("msgq_show() after filling for test 5:\n");
+        msgq_show(mq);
       default:
         printf("invalid test selection!\n");
         break;
